@@ -11,6 +11,7 @@ $ git clone https://github.com/ramon-oestreich/adonis-v5-crud-basic.git
 $ cd adonis-v5-crud-basic/
 $ npm install 
 $ cp .env.example .env
+$ node ace generate:key
 $ configure file .env with environments
 $ node ace migration:run
 $ up server node ace serve --watch
