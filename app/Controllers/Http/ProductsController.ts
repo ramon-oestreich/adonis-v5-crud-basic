@@ -4,12 +4,14 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 export default class ProductsController {
 
-  public async index({ }: HttpContextContract) {
-    return await Product.all();
+
+  public async index({ response }: HttpContextContract) {
+    const products = await Product.all();
+    return response.status(200).json(products)
   }
 
-  public async store({ request }: HttpContextContract) {
-    
+  public async store({ request, response }: HttpContextContract) {
+
     let data = request.only([
       'name', 'price', 'brand', 'category'
     ]);
@@ -17,21 +19,26 @@ export default class ProductsController {
     const file = request.file('path_image')
 
     if (!file) {
-      return 'Insira um arquivo!'
+      return 'Insert file!'
     }
 
     await file.move(Application.tmpPath('upload'))
     data['path_image'] = `uploads/${file.clientName}`
+    const product = await Product.create(data)
 
-    return await Product.create(data)
+    return response.status(201).json(product)
   }
 
-  public async show({ params }: HttpContextContract) {
-    return await Product.find(params.id)
+  public async show({ params, response }: HttpContextContract) {
+    const product = await Product.find(params.id)
+    if (!product) {
+      return response.status(404).json({ message: 'Product not found!' })
+    }
+    return response.status(200).json(product)
   }
 
 
-  public async update({ params, request }: HttpContextContract) {
+  public async update({ params, request, response }: HttpContextContract) {
 
     const product = await Product.findOrFail(params.id)
 
@@ -49,12 +56,15 @@ export default class ProductsController {
     data['path_image'] = `uploads/${file.clientName}`
 
     await product.merge(data)
-    product.save()
+    return response.status(200).json(product.save())
 
   }
 
-  public async destroy({ params }: HttpContextContract) {
+  public async destroy({ params, response }: HttpContextContract) {
     const product = await Product.find(params.id)
-    product?.delete()
+    if (!product) {
+      return response.status(404).json({ message: 'Product not found!' })
+    }
+    return response.status(200).json(product?.delete())
   }
 }
