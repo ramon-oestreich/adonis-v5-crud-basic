@@ -14,12 +14,3 @@ export const ProductFactory = Factory
 .build()
 
 
-export const UserFactory = Factory
-  .define(User, ({ faker }) => {
-    return {
-      username: faker.internet.userName(),
-      email: faker.internet.email(),
-      password: faker.internet.password(),
-    }
-  })
-  .build()
