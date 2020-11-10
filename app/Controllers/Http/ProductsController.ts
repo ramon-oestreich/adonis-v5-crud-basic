@@ -1,4 +1,3 @@
-import Application from '@ioc:Adonis/Core/Application';
 import Product from 'App/Models/Product';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
@@ -12,18 +11,10 @@ export default class ProductsController {
 
   public async store({ request, response }: HttpContextContract) {
 
-    let data = request.only([
-      'name', 'price', 'brand', 'category'
+    const data = request.only([
+      'name', 'price', 'brand', 'category', 'path_image'
     ]);
 
-    const file = request.file('path_image')
-
-    if (!file) {
-      return 'Insert file!'
-    }
-
-    await file.move(Application.tmpPath('upload'))
-    data['path_image'] = `uploads/${file.clientName}`
     const product = await Product.create(data)
 
     return response.status(201).json(product)
@@ -40,23 +31,17 @@ export default class ProductsController {
 
   public async update({ params, request, response }: HttpContextContract) {
 
-    const product = await Product.findOrFail(params.id)
+    const product = await Product.find(params.id)
 
-    let data = request.only([
-      'name', 'price', 'brand', 'category'
+    const data = request.only([
+      'name', 'price', 'brand', 'category', 'path_image'
     ]);
-
-    const file = request.file('path_image')
-
-    if (!file) {
-      return 'Insira um arquivo!'
+    if (!product) {
+      return response.status(404).json({ message: 'Product not found!' })
     }
 
-    await file.move(Application.tmpPath('upload'))
-    data['path_image'] = `uploads/${file.clientName}`
-
-    await product.merge(data)
-    return response.status(200).json(product.save())
+    await product?.merge(data)
+    return response.status(200).json(product?.save())
 
   }
 
