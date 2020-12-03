@@ -1,3 +1,7 @@
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.resource('products','ProductsController').apiOnly();
+Route.get('/', async () => {
+    return 'home page'
+})
+
+Route.resource('products', 'ProductsController').apiOnly();
